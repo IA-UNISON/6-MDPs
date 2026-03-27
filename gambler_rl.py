@@ -71,12 +71,52 @@ print("-"*10 + '|' + "-"*10 + '|' + "-"*10)
 Responde las siguientes preguntas:
 ***************************************************************************************
 1. ¿Qué pasa si se modifica el valor de epsilón de la política epsilon-greedy?
+
+    En este caso, el valor de epsilon representa la probabilidad de explorar
+    una accion aleatoria, en lugar de escoger la mejor accion conocida al momento.
+
+    Esto quiere decir que mientras mas alto sea el valor de epsilon, la probabilidad
+    de esocger una accion aleatroria es mayor. Esto nos sirve para que el algoritmo
+    explore nuevas estrategias.
+
+    En el caso contrario, elegir un valor epsilon bajo hace que el algoritmo eliga con
+    mas probailidad la mejor accion, lo que hace que el algoritmo explore menos pero es mas
+    seguro.
+
 2. ¿Para que sirve usar una politica epsilon-greedy?
+
+    Precisamente usar una politica epsilon-greedy nos ayuda a balancear que tanto exploramos
+    o que tanto usemos el conocimiento aprendido (Explotar)
+
 3. ¿Qué pasa con la política óptima y porqué si p_h es mayor a 0.5?
+
+    Cuando p_h es mayor a 0.5, esto siginifica que las probabilidades de ganar en el juego 
+    son mayores a las de perder. Esto causaria que la politica apostará mas, con la
+    intencion de ganar mas y asi llegar a la meta.
+
 4. ¿Y si es 0.5?
+
+    En este caso, la probabilidad de ganar es igual a la de perder. Esto significa que
+    la politica tenderá a hacer apuestas mas pequeñas, con la intencion de reducir el 
+    riesgo de perder. En este estado no hay una ventaja por apostar mas.
+
 5. ¿Y si es menor a 0.5?
+    En este caso, la probabilidad de ganar es menor a la de perder. Esto significa que
+    la politica buscará apostar los menos posible, esto con la intencion de minimizar 
+    daños. Se vuelve muy dificil ganar.
+
 6. ¿Qué pasa si se modifica el valor de la tasa de aprendizaje?
+    Si el valor de la tasa de aprendizaje es muy alta, el agente aprenderá rápido, pero
+    es mas suceptible a cometer errores.
+    Si el valor de la tasa de aprendizaje es muy bajo, el agente aprenderá lentamente,
+    pero es mas seguro.
+
 7. ¿Qué pasa si se modifica el valor de gama?
+
+    El valor de gamma representa la importancia que tienen las recompenasas futuras.
+    Si el valor de gamma es muy alto, el agente se concentra en su ganacia futura.
+    Si el valor de gamma es muy bajo, el agente se concentra en ganacias inmediatas,
+    lo que puede causar comportamientos erraticos..
 
 ***************************************************************************************
 
