@@ -55,7 +55,7 @@ mdp_sim = CamionMagico(
     
 Q_sarsa = SARSA(
     mdp_sim, 
-    alfa=0.1, epsilon=0.02, n_ep=100_000, n_iter=50
+    alfa=0.1, epsilon=0.02, n_ep=100_000, n_iter=1000
 )
 pi_s = {s: max(
     ['caminar', 'usar_camion'], key=lambda a: Q_sarsa[(s, a)]
@@ -83,11 +83,27 @@ Ahora responde a las siguientes preguntas:
 **********************************************************************************
 
 - Prueba con diferentes valores de rho. ¿Qué observas? ¿Porqué crees que pase eso?
+mientras mas aumente el rho, aumenta el numero de tramos, cuando rho es muy bajo, 
+no conviene por que hay pocos camiones confiables.
+
 - Prueba con diferentes valores de gama. ¿Qué observas? ¿Porqué crees que pase eso?
+que mientras mas alto sea gama, se toma mas el futuro incluso si el costo inmediato
+es mayor, en cambio si es menor, se evade el camion, por que no es confiable.
+
 - ¿Qué tan diferente es la política óptima de SARSA y Q-learning?
+SARSA ciertamente es mas complejo, y este sugiere tomar mas camiones, en cambio QLarning
+sugiere tomar unicamente los camiones que sean necesarios para tener exito.
+
 - ¿Cambia mucho el resultado cambiando los valores de recompensa?
+Si, mientras mas alto sea mas difieren entre si
+
 - ¿Cuantas iteraciones se necesitan para que funcionen correctamente los algoritmos?
+puede variar, pero si el numero de iteraciones es el mismo, siempre funcionara, en 
+cambio si difieren se pueden igualar 
+
 - ¿Qué pasaria si ahora el estado inicial es cualquier estado de la mitad para abajo?
+Partiria desde ahi, pero disminuiria el numero de tramos, y por ende tambien rho
+
 **********************************************************************************
 
 """

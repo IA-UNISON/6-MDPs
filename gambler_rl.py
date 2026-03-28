@@ -71,12 +71,27 @@ print("-"*10 + '|' + "-"*10 + '|' + "-"*10)
 Responde las siguientes preguntas:
 ***************************************************************************************
 1. ¿Qué pasa si se modifica el valor de epsilón de la política epsilon-greedy?
+cuando aumenta, se hacen mas recorridos y explora mas, caso contrario este explora menos, haciendo menos recorridos
+y usa lo que se encontro
+
 2. ¿Para que sirve usar una politica epsilon-greedy?
+para explorar todos los posibles caminos que den a mejores recompensas que tiene a su alcanze 
+
 3. ¿Qué pasa con la política óptima y porqué si p_h es mayor a 0.5?
+la primera cosa que pasaria, es que se desnivela, y hay mas probabilidad de tener recompensas
+
+
 4. ¿Y si es 0.5?
+se nivelea
+
 5. ¿Y si es menor a 0.5?
+hay menor probabilidad de ganar y no hay recompensas
+
 6. ¿Qué pasa si se modifica el valor de la tasa de aprendizaje?
+puede variar segun si es alta o baja, y varia en su aprendizaje, puede ser rapido o mas lento
+
 7. ¿Qué pasa si se modifica el valor de gama?
+aplica lo mismo de recompensas futuras, y conserva mas si disminuye gama
 
 ***************************************************************************************
 
