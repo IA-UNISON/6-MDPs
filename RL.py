@@ -50,13 +50,52 @@ class MDPsim(metaclass=ABCMeta):
         """
         return False
 
+class Politica(metaclass=ABCMeta):
+    @abstractmethod
+    def __call__(self, s):
+        """
+        Devuelve la acción a tomar en el estado s.
+        
+        """
+        raise NotImplementedError("Acción no implementada")
+    
+class PoliticaAleatoria(Politica):
+    def __init__(self, mdp):
+        self.mdp = mdp
+        
+    def __call__(self, s):
+        return choice(self.mdp.acciones_legales(s))
+    
+class PoliticaEgreedy(Politica):
+    def __init__(self, Q, epsilon):
+        self.Q = Q
+        self.epsilon = epsilon
+        
+    def __call__(self, s):
+        acciones = [a for (s_, a) in self.Q if s_ == s]
+        if random() < self.epsilon:
+            return choice(acciones)
+        else:
+            return max(acciones, key=lambda a: self.Q[(s, a)])
+        
+    def actualizar(self, Q):
+        self.Q = Q.copy()
+        
+class PoliticaGreedy(Politica):
+    def __init__(self, Q):
+        self.pi = {s: max((a for (s_, a) in Q if s_ == s), key=lambda a: Q[(s, a)])
+                   for s in set(s_ for (s_, _) in Q)}
+    
+    def __call__(self, s):
+        return self.pi.get(s, None)
+
 def TD0(mdp, politica, alfa, n_ep, n_iter):
     """
     Algoritmo de TD(0) para estimar la función de valor de un MDP.
     
     Parámetros:
         mdp: objeto de la clase MDP
-        politica: diccionario que devuelve la acción en un estado
+        politica: objeto de la clase Politica
         alfa: tasa de aprendizaje
         n_ep: número máximo de episodios
         n_iter: número máximo de iteraciones por episodio
@@ -67,29 +106,13 @@ def TD0(mdp, politica, alfa, n_ep, n_iter):
     for _ in range(n_ep):
         s = mdp.estado_inicial()
         for _ in range(n_iter):
-            a = politica[s]
+            a = politica(s)
             s_ = mdp.transicion(s, a)
             V[s] += alfa * (mdp.recompensa(s, a, s_) + mdp.gama * V[s_] - V[s])
             if mdp.es_terminal(s_):
                 break
             s = s_  
     return V
-
-def politica_e_greedy(Q, s, acciones, epsilon):
-    """
-    Política epsilon-greedy.
-    
-    Parámetros:
-        Q: diccionario con la función de valor Q
-        s: estado
-        acciones: lista con las acciones legales
-        epsilon: probabilidad de exploración
-    
-    """
-    if random() < epsilon:
-        return choice(acciones)
-    else:
-        return max(acciones, key=lambda a: Q[(s, a)])
 
 def SARSA(mdp, epsilon, alfa, n_ep, n_iter):
     """
@@ -103,22 +126,24 @@ def SARSA(mdp, epsilon, alfa, n_ep, n_iter):
         n_iter: número de iteraciones
     
     """
-    Q = {(s, a): random() 
+    Q = {(s, a): 0 
          for s in mdp.estados if not mdp.es_terminal(s) 
          for a in mdp.acciones_legales(s)}
-        
+    pi = PoliticaEgreedy(Q, epsilon)
+     
     for _ in range(n_ep):
         s = mdp.estado_inicial()
-        a = politica_e_greedy(Q, s, mdp.acciones_legales(s), epsilon)
+        a = pi(s)
         for _ in range(n_iter):
             s_ = mdp.transicion(s, a)
             r = mdp.recompensa(s, a, s_)
             if mdp.es_terminal(s_):
                 Q[(s, a)] += alfa * (r - Q[(s, a)])
                 break
-            a_ = politica_e_greedy(Q, s_, mdp.acciones_legales(s_), epsilon)
+            a_ = pi(s_)
             Q[(s, a)] += alfa * (r + mdp.gama * Q[(s_, a_)] - Q[(s, a)])
-            s, a = s_, a_       
+            s, a = s_, a_
+            pi.actualizar(Q)       
     return Q
 
 def Q_learning(mdp, epsilon, alfa, n_ep, n_iter):
@@ -136,11 +161,12 @@ def Q_learning(mdp, epsilon, alfa, n_ep, n_iter):
     Q = {(s, a): 0 
          for s in mdp.estados if not mdp.es_terminal(s)
          for a in mdp.acciones_legales(s)}
+    pi = PoliticaEgreedy(Q, epsilon)
     
     for _ in range(n_ep):
         s = mdp.estado_inicial()
         for _ in range(n_iter):
-            a = politica_e_greedy(Q, s, mdp.acciones_legales(s), epsilon)
+            a = pi(s)
             s_ = mdp.transicion(s, a)
             r = mdp.recompensa(s, a, s_)
             if mdp.es_terminal(s_):
@@ -151,4 +177,5 @@ def Q_learning(mdp, epsilon, alfa, n_ep, n_iter):
                 + mdp.gama * max(Q[(s_, a_)] for a_ in mdp.acciones_legales(s_)) 
                 - Q[(s, a)])
             s = s_
+            pi.actualizar(Q)
     return Q

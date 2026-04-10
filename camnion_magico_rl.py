@@ -3,7 +3,7 @@ El camión mágico, pero ahora por simulación
 
 """
 
-from RL import MDPsim, SARSA, Q_learning
+from RL import MDPsim, SARSA, Q_learning, PoliticaGreedy
 from random import random, randint
 
 class CamionMagico(MDPsim):
@@ -22,58 +22,43 @@ class CamionMagico(MDPsim):
         self.gama = gama
         self.rho = rho
         self.meta = meta
-        self.estados = tuple(range(1, meta + 2))
+        self.estados = tuple(range(1, meta + 1))
     
     def estado_inicial(self):
         #return randint(1, self.meta // 2 + 1)
-        return randint(1, self.meta - 1)
+        #return randint(1, self.meta - 1)
+        return 1
     
     def acciones_legales(self, s):
-        if s >= self.meta:
-            return []
-        return ['caminar', 'usar_camion']
+        return (['caminar', 'usar_camion'] if s < self.meta // 2 else
+                ['caminar'] if s < self.meta else 
+                [])
     
     def recompensa(self, s, a, s_):
-        return (
-            -100  if s_ > self.meta else
-             100  if s_ == self.meta else
-            -1  if a == 'caminar' else -2   
-        ) 
+        return  -1  if a == 'caminar' else -2 
         
     def transicion(self, s, a):
         if a == 'caminar':
-            return min(s + 1, self.meta + 1)
+            return s + 1
         elif a == 'usar_camion':
-            return min(self.meta + 1, 2*s) if random() < self.rho else s
+            return 2*s if random() < self.rho else s
         
     def es_terminal(self, s):
         return s >= self.meta
 
-mdp_sim = CamionMagico(
-    gama=0.999, rho=0.9, meta=145
-)
+mdl = CamionMagico(gama=0.999, rho=0.999, meta=145)
     
-Q_sarsa = SARSA(
-    mdp_sim, 
-    alfa=0.1, epsilon=0.02, n_ep=100_000, n_iter=50
-)
-pi_s = {s: max(
-    ['caminar', 'usar_camion'], key=lambda a: Q_sarsa[(s, a)]
-) for s in mdp_sim.estados if not mdp_sim.es_terminal(s)}
+Q_sarsa = SARSA(mdl, epsilon=0.2, alfa=0.5,  n_ep=5_000, n_iter=150)
+pi_s = PoliticaGreedy(Q_sarsa)
 
-Q_ql = Q_learning(
-    mdp_sim, 
-    alfa=0.1, epsilon=0.02, n_ep=100_000, n_iter=1000
-)
-pi_ql = {s: max(
-    ['caminar', 'usar_camion'], key=lambda a: Q_ql[(s, a)]
-) for s in mdp_sim.estados if not mdp_sim.es_terminal(s)}
+Q_ql = Q_learning(mdl, epsilon=0.2, alfa=0.5,  n_ep=5_000, n_iter=150)
+pi_ql = PoliticaGreedy(Q_ql)
 
 print(f"Los tramos donde se debe usar el camión segun SARSA son:")
-print([s for s in pi_s if pi_s[s] == 'usar_camion'])
+print([s for s in mdl.estados if pi_s(s) == 'usar_camion'])
 print("-"*50)
 print(f"Los tramos donde se debe usar el camión segun Qlearning son:")
-print([s for s in pi_ql if pi_ql[s] == 'usar_camion'])
+print([s for s in mdl.estados if pi_ql(s) == 'usar_camion'])
 print("-"*50)
 
 
