@@ -68,11 +68,28 @@ Ahora responde a las siguientes preguntas:
 **********************************************************************************
 
 - Prueba con diferentes valores de rho. ¿Qué observas? ¿Porqué crees que pase eso?
+    Al aumentar rho, se usa más el camión, supongo que porque suele ser más rentable
+    que caminar, pero cuando se disminuye, utiliza menos el camión, ya que es más 
+    costoso.
+
 - Prueba con diferentes valores de gama. ¿Qué observas? ¿Porqué crees que pase eso?
+    Con gama bajo, no se enfoca tanto en llegar a la meto, sino en la recompensas
+    inmediatas, pasa lo contrario con gama alto.
+
 - ¿Qué tan diferente es la política óptima de SARSA y Q-learning?
+    Q-learning es más ambicioso que SARSA, supongo que SARSA va a medir más las
+    acciones que Q-learning.
+
 - ¿Cambia mucho el resultado cambiando los valores de recompensa?
+    Si, ya que el algoritmo se basa en minimizar o maximizar la suma de recompensas,
+    si se penalizara más el usar el camión, al final solo caminaríamos más.
+
 - ¿Cuantas iteraciones se necesitan para que funcionen correctamente los algoritmos?
+    Yo digo que unas 100,000 está bien para garantizar una política estable.
+
 - ¿Qué pasaria si ahora el estado inicial es cualquier estado de la mitad para abajo?
+    El aprendizaje se enfocaría más en esa mitad y aprendería menos de la mitad para
+    arriba, haciendo que los valores de la segunda mitad sean imprecisos o inestables.
 **********************************************************************************
 
 """
