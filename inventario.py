@@ -2,48 +2,64 @@
 Para desarrollar el problema del inventario.
 
 """
-
 from MDPs import MDP, iteracion_valor
 
 class Inventario(MDP):
     """
-    Clase que representa un MDP para el problema del camión mágico.
-    
-    Si caminas, avanzas 1 con coso 1
-    Si usas el camion, con probabilidad rho avanzas el doble de donde estabas
-    y con probabilidad 1-rho te quedas en el mismo lugar. Todo con costo 2.
-    
-    El objetivo es llegar a la meta en el menor costo posible
-    
+    Clase que representa un MDP para el problema del inventario.
+
+    Objetivo:
+    Se busca decidir cada tarde cuántas unidades pedir al proveedor para maximizar el beneficio a largo plazo
+
     """    
     
-    def __init__(self, gama,lambda_, ...): #TODO: Agregar lo que se requiera
-        #TODO: Completar el constructor
-        self.gamma = #TODO: Agregar lo que se requiera
-        self.lambda_ = #TODO: Agregar lo que se requiera
-        self.estados = #TODO: Agregar lo que se requiera
-        #TODO: Agregar lo que se requiera
-    
+    def __init__(self, gamma=0.95, lambda_=4, precio_de_venta=150, costo_de_compra=80, costo_fijo_de_pedido=40,
+                 costo_de_almacenamiento=5, costo_de_backlogging=15):
+        """
+        Inicializando las variables a utilizar:
+        Gama: Es el factor de descuento
+        Lambda_: Es la tasa promedio de la demanda. Representa la cantidad de clientes que llegan a comprar
+        Precio de Venta: $150.00 por unidad vendida.
+        Costo de Compra: $80.00 por unidad pedida al proveedor.
+        Costo Fijo de Pedido: $40.00 por cada pedido realizado
+        Costo de Almacenamiento: $5.00 por cada unidad que se quede en el estante al final del día.
+        Costo de Backlogging (Inventario Negativo): Si la demanda supera las existencias, los clientes aceptan esperar,
+        pero la empresa incurre en un costo de "buena voluntad" y logística de $15.00 por unidad faltante al final del día.
+        """
+        self.gama = gamma
+        self.lambda_ = lambda_
+        self.estados = tuple(range(-10, 21))
+
+        self.precio_de_venta = precio_de_venta
+        self.costo_de_compra = costo_de_compra
+        self.costo_fijo_de_pedido = costo_fijo_de_pedido
+        self.costo_de_almacenamiento = costo_de_almacenamiento
+        self.costo_de_backlogging = costo_de_backlogging
+        self.perdida = self.precio_de_venta - self.costo_de_compra
+
     def acciones_legales(self, s):
-        #TODO: Completar este método
-        pass
+        """
+        La acción utilizada (a) debe cumplir que el inventario en el almacén disponible al siguiente dia no exceda
+        la capacidad de 20
+        """
+        lim = 20 - s
+        return list(range(0, lim + 1))
     
     def recompensa(self, s, a, s_):
-        #TODO: Completar este método
+        # TODO: Completar este método
         pass
         
     def prob_transicion(self, s, a, s_):
-        #TODO: Completar este método
+        # TODO: Completar este método
         pass
                 
     def es_terminal(self, s):
-        #TODO: Completar este método
-        pass
+        return False
 
 
 if __name__ == "__main__":
 
-    inventario = Inventario(0.9, 0.5, ...)  #TODO: Agregar lo que se requiera
+    inventario = Inventario(0.95, 4, ...)  #TODO: Agregar lo que se requiera
 
     pi_star, V = iteracion_valor(inventario, ...) #TODO: Agregar lo que se requiera
 
