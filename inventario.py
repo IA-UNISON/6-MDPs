@@ -2,6 +2,7 @@
 Para desarrollar el problema del inventario.
 
 """
+import math
 from MDPs import MDP, iteracion_valor
 
 class Inventario(MDP):
@@ -13,7 +14,7 @@ class Inventario(MDP):
 
     """    
     
-    def __init__(self, gamma=0.95, lambda_=4, precio_de_venta=150, costo_de_compra=80, costo_fijo_de_pedido=40,
+    def __init__(self, gama=0.95, lambda_=4, precio_de_venta=150, costo_de_compra=80, costo_fijo_de_pedido=40,
                  costo_de_almacenamiento=5, costo_de_backlogging=15):
         """
         Inicializando las variables a utilizar:
@@ -26,7 +27,7 @@ class Inventario(MDP):
         Costo de Backlogging (Inventario Negativo): Si la demanda supera las existencias, los clientes aceptan esperar,
         pero la empresa incurre en un costo de "buena voluntad" y logística de $15.00 por unidad faltante al final del día.
         """
-        self.gama = gamma
+        self.gama = gama
         self.lambda_ = lambda_
         self.estados = tuple(range(-10, 21))
 
@@ -46,12 +47,33 @@ class Inventario(MDP):
         return list(range(0, lim + 1))
     
     def recompensa(self, s, a, s_):
-        # TODO: Completar este método
-        pass
+        inventario_sig_dia = s + a
+        demanda_real = inventario_sig_dia - s_
+        existencias = max(0, inventario_sig_dia)
+
+        costo_al_pedir = (self.costo_fijo_de_pedido + self.costo_de_compra * a) if a > 0 else 0
+
+        unidades_vendidas = max(0, min(existencias, demanda_real))
+        ingresos = self.precio_de_venta * unidades_vendidas
+
+        costos_finales = (self.costo_de_almacenamiento * s_) if s_ > 0 else (
+            self.costo_de_backlogging * abs(s_) if s_ < 0 else 0)
+
+        ventas_a_deber = max(0, demanda_real - existencias)
+        perdida_falta_stock = self.perdida * ventas_a_deber
+
+        return ingresos - costo_al_pedir - costos_finales - perdida_falta_stock
         
     def prob_transicion(self, s, a, s_):
-        # TODO: Completar este método
-        pass
+        demanda = (s + a) - s_
+        if demanda < 0: return 0
+
+        lam = self.lambda_
+
+        if s_ == -10:
+            return sum((math.exp(-lam) * (lam ** k)) / math.factorial(k) for k in range(demanda, 31))
+
+        return (math.exp(-lam) * (lam ** demanda)) / math.factorial(demanda)
                 
     def es_terminal(self, s):
         return False
@@ -59,9 +81,9 @@ class Inventario(MDP):
 
 if __name__ == "__main__":
 
-    inventario = Inventario(0.95, 4, ...)  #TODO: Agregar lo que se requiera
+    inventario = Inventario(0.95, 4,)
 
-    pi_star, V = iteracion_valor(inventario, ...) #TODO: Agregar lo que se requiera
+    pi_star, V = iteracion_valor(inventario, epsilon=1e-4)
 
     print("-" * 60)
     print("Estado".center(20) + "Acción".center(20) + "Valor".center(20))
