@@ -11,8 +11,8 @@ class MDP(metaclass=ABCMeta):
     Clase para definir un MDP discreto.
     
     Es necesario establecer 
-        - La forma de representar el estado como una tupla (s \in S)
-        - La forma de representar las acciones (a \in A)
+        - La forma de representar el estado como una tupla (s in S)
+        - La forma de representar las acciones (a in A)
         - Un factor de descuento gama
         
     Los métodos que deben implementarse son:
