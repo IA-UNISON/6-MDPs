@@ -17,16 +17,14 @@ class Inventario(MDP):
     
     """    
     
-    def __init__(self, gama,lambda_, ...): #TODO: Agregar lo que se requiera
-        #TODO: Completar el constructor
-        self.gamma = #TODO: Agregar lo que se requiera
-        self.lambda_ = #TODO: Agregar lo que se requiera
-        self.estados = #TODO: Agregar lo que se requiera
-        #TODO: Agregar lo que se requiera
+    def __init__(self, gamma, lambda_, estados):
+        self.gamma = 0.95
+        self.lambda_ = 4
+        self.estados = [i for i in range(-10, 21)]
     
     def acciones_legales(self, s):
-        #TODO: Completar este método
-        pass
+        rango = 20 - s
+        self.acciones_legales = [i for i in range(rango)]
     
     def recompensa(self, s, a, s_):
         #TODO: Completar este método
