@@ -81,3 +81,42 @@ if __name__ == "__main__":
     for s in pi_star:
         print(f"{s:^20}{pi_star[s]:^20}{V[s]:^20.2f}")
     print("-" * 60)
+
+
+"""
+Contesta las preguntas aquí mismo (has espacio entre las preguntas):
+
+1. ¿Cómo se comporta las transiciones y las ganancias para casos específicos de $s$ y $a$? 
+R: Si s y a suman un nivel alto, las transiciones se concentran en estados estables dictados por la media del parámetro lambda.
+ Las ganancias son altas por ingresos de ventas estables, balanceadas por costos bajos de almacén. En niveles de s+a muy bajos,
+   la transición decae hacia estados negativos (backlog), activando penalizaciones asimétricas severas.
+
+2. ¿Qué psa si hay mucho almacen? 
+R: Un exceso de inventario remanente (estados cercanos a 20) genera penalizaciones diarias acumulativas por mantenimiento ($5 por unidad).
+ Esto mitiga el margen de beneficio neto, forzando al algoritmo a elegir la acción a=0 para vaciar el estante usando la demanda orgánica antes 
+ de volver a incurrir en costos fijos.
+
+3. ¿Que pasa si hay muy poco o estamos sin almacen? 
+R: Al caer en desabasto o backlog, el negocio asume penalizaciones de logística ($15 por unidad faltante). Si se llega al límite inferior s=-10,
+ cualquier demanda adicional satura el sistema y se pierde por completo la oportunidad del margen de ganancia de $70.
+   El MDP mitiga esto ejecutando pedidos de gran escala para salir de la zona de penalización.
+
+4. ¿Existe un punto donde la ganancia sea máxima? 
+R: Sí, se localiza un punto de balance óptimo donde el nivel de inventario total amortiza el costo de 
+almacenamiento y cubre eficientemente el riesgo de desabasto bajo la distribución estocástica.
+
+---
+
+5. ¿Cómo se ve la política óptima? ¿Tiene sentido?
+R: Adopta la estructura de una política de umbral (s, S). Indica no pedir nada (a=0) mientras el stock se mantenga positivo para evadir el costo fijo de $40,
+ pero si cae a 0 o menos, gatilla un pedido lo suficientemente grande para regresar a los niveles ideales de amortización de la demanda.
+   Tiene absoluto sentido comercial.
+
+6. ¿Como se comporta la función de valor de estado V(s)?
+R: Es monótonamente creciente y cóncava. Su valor mínimo se encuentra en s=-10 producto de la acumulación de deudas de producto,
+ ascendiendo de manera pronunciada conforme se transiciona hacia un inventario positivo, estabilizándose en los niveles más altos del almacén.
+
+7. ¿Cómo cambiaría la política si la variabilidad de la demanda (lambda) aumenta de 4 a 8?
+R: Al duplicarse el consumo de inventario diario, los umbrales de la política óptima se desplazarían hacia arriba.
+ El sistema requerirá reordenar cantidades sustancialmente mayores con mucha más anticipación para blindar la operación contra las penalizaciones por desabasto.
+"""
