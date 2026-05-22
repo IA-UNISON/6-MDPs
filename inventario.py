@@ -48,7 +48,36 @@ class Inventario(MDP):
         return 0.0
                 
     def recompensa(self, s, a, s_):
-        pass
+        # Unidades físicamente transaccionadas = (Inventario inicial del día) - (Inventario final)
+        unidades_vendidas = (s + a) - s_
+        ingreso = 150 * unidades_vendidas
+        
+        # Costo de pedido: Fijo ($40) + Variable ($80 * a)
+        costo_pedido = (40 + 80 * a) if a > 0 else 0
+        
+        # Costo de mantenimiento ($5 por unidad sobrante)
+        costo_almacen = 5 * s_ if s_ > 0 else 0
+        
+        # Costo de backlogging ($15 por unidad faltante)
+        costo_backlog = 15 * (-s_) if s_ < 0 else 0
+        
+        # La pérdida de oportunidad (margen de $70) está implícita:
+        # Al no vender las unidades perdidas, no sumamos los $150 de ingreso,
+        # pero tampoco pagamos los $80 de costo. El margen ya está restado del beneficio neto.
+        
+        return ingreso - costo_pedido - costo_almacen - costo_backlog
 
     def es_terminal(self, s):
-        pass
+        # El problema es de horizonte infinito, el negocio continúa día a día.
+        return False
+
+if __name__ == "__main__":
+    inventario = Inventario(gama=0.95, lambda_=4)
+    pi_star, V = iteracion_valor(inventario, epsilon=1e-4, max_iter=1000)
+
+    print("-" * 60)
+    print("Estado".center(20) + "Acción".center(20) + "Valor".center(20))
+    print("-" * 60 )
+    for s in pi_star:
+        print(f"{s:^20}{pi_star[s]:^20}{V[s]:^20.2f}")
+    print("-" * 60)
