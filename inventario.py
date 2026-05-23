@@ -47,6 +47,9 @@ class Inventario(MDP):
         return list(range(0, lim + 1))
     
     def recompensa(self, s, a, s_):
+        """
+        Representa el cierre de caja al final del día y retorna el dinero neto
+        """
         inventario_sig_dia = s + a
         demanda_real = inventario_sig_dia - s_
         existencias = max(0, inventario_sig_dia)
@@ -65,6 +68,10 @@ class Inventario(MDP):
         return ingresos - costo_al_pedir - costos_finales - perdida_falta_stock
         
     def prob_transicion(self, s, a, s_):
+        """
+        Calcula qué tan probable es terminar el día con cierto inventario usando
+        la distribución de Poisson
+        """
         demanda = (s + a) - s_
         if demanda < 0: return 0
 
@@ -76,6 +83,10 @@ class Inventario(MDP):
         return (math.exp(-lam) * (lam ** demanda)) / math.factorial(demanda)
                 
     def es_terminal(self, s):
+        """
+        Indica si el problema llegó a su fin pero siempre retornará False porque
+        la tienda abre todos los días
+        """
         return False
 
 
