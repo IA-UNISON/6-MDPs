@@ -15,11 +15,12 @@ class Inventario(MDP):
     
     El objetivo es llegar a la meta en el menor costo posible
     
-    """    
-    
+    """
+
     def __init__(self, gamma, lambda_, estados):
         self.gamma = 0.95
         self.lambda_ = 4
+        self.k_max = 15
         self.estados = [i for i in range(-10, 21)]
     
     def acciones_legales(self, s):
@@ -27,17 +28,75 @@ class Inventario(MDP):
         self.acciones_legales = [i for i in range(rango)]
     
     def recompensa(self, s, a, s_):
-        #TODO: Completar este método
-        pass
-        
-    def prob_transicion(self, s, a, s_):
-        #TODO: Completar este método
-        pass
-                
-    def es_terminal(self, s):
-        #TODO: Completar este método
-        pass
+        from math import factorial, exp
 
+        def precio_venta(s, a):
+            suma_esperada = 0.0
+            
+            disponible = max(s + a, 0)
+            
+            for k in range(self.k_max + 1):
+                probabilidad = (exp(-self.lambda_) * (self.lambda_ ** k)) / factorial(k)
+                
+                vendido = min(disponible, k)
+            
+                suma_esperada += (150 * vendido) * probabilidad
+                
+            return suma_esperada
+        
+        def costo_compra(a):
+            return a * 80
+        
+        def costo_fijo_pedido(a):
+            return 40 if a > 0 else 0
+        
+        def costo_almacenamiento(s,a):
+            suma_esperada = 0.0
+
+            inventario = max(s + a, 0)
+
+            for k in range(self.k_max + 1):
+                probabilidad = (exp(-self.lambda_) * (self.lambda_ ** k)) / factorial(k)
+                suma_esperada += inventario * probabilidad
+                
+            return 5 * suma_esperada
+        
+        def costo_inv_negativo(s,a):
+            suma_esperada = 0.0
+
+            for k in range(self.k_max + 1):
+                probabilidad = (exp(-self.lambda_) * (self.lambda_ ** k)) / factorial(k)
+                suma_esperada += max(k - (s + a), 0) * probabilidad
+
+            return 85 * suma_esperada
+        
+        return precio_venta(s,a) + (-costo_compra(a)) + (-costo_fijo_pedido(a)) + (-costo_almacenamiento(s,a)) + (-costo_inv_negativo(s,a))
+         
+    def prob_transicion(self, s, a, s_):
+        from math import factorial, exp
+        
+        D = s + a - s_
+
+        if D >= 0 and s_ > -10:
+            probabilidad = (exp(-self.lambda_) * (self.lambda_ ** D)) / factorial(D)
+            return probabilidad
+            
+        if s_ > s + a:
+            return 0.0
+        
+        if s_ == -10:
+            suma_esperada = 0.0
+
+            for k in range((s+a+10), self.k_max+1):
+                probabilidad = (exp(-self.lambda_) * (self.lambda_ ** k)) / factorial(k)
+                suma_esperada += probabilidad
+
+            return suma_esperada
+
+        return 0.0
+             
+    def es_terminal(self, s):
+        return False # No hay un estado terminal
 
 if __name__ == "__main__":
 
