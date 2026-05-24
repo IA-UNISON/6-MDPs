@@ -6,19 +6,40 @@ Para desarrollar el problema del inventario.
 from MDPs import MDP, iteracion_valor
 
 class Inventario(MDP):
-    """  
     """
-    def __init__(self, gama, lambda_):
+    MDP para el problema del inventario.  
+    """
+    def __init__(self, 
+                 gama = 0.95, 
+                 lambda_= 4, 
+                 estados = (-10,20),
+                 k_max = 15, 
+                 precio_venta = 150, 
+                 costo_compra = 80, 
+                 costo_fijo_pedido = 40, 
+                 costo_almacenamiento = 5,
+                 costo_backlog = 15):
+    
+        # Parametros MDP
         self.gama = gama
         self.lambda_ = lambda_
-        self.k_max = 15
-        self.estados = [i for i in range(-10, 21)]
+        self.k_max = k_max
+
+        # Ingresos
+        self.precio_venta = precio_venta
+        # Costos
+        self.costo_compra = costo_compra
+        self.costo_fijo_pedido = costo_fijo_pedido
+        self.costo_almacenamiento = costo_almacenamiento
+        self.costo_perdida = costo_backlog + (self.precio_venta - self.costo_compra)
+
+        self.estados = tuple([i for i in range(estados[0], estados[1]+1)])
     
     def acciones_legales(self, s):
-        rango = 20 - s
+        rango = self.estados[-1] - s
         return [i for i in range(rango + 1)]
     
-    def recompensa(self, s, a, s_):
+    def recompensa(self, s, a, s_=None):
         from math import factorial, exp
 
         def precio_venta(s, a):
@@ -31,13 +52,13 @@ class Inventario(MDP):
                 
                 vendido = min(disponible, k)
             
-                suma_esperada += (150 * vendido) * probabilidad
+                suma_esperada += (self.precio_venta * vendido) * probabilidad
                 
             return suma_esperada
                
         def costo_compra_mas_pedido(a):
-            costo = a * 80
-            return costo + 40 if a > 0 else costo
+            costo = a * self.costo_compra
+            return costo + self.costo_fijo_pedido if a > 0 else costo
         
         def costo_almacenamiento(s,a):
             suma_esperada = 0.0
@@ -46,7 +67,7 @@ class Inventario(MDP):
                 probabilidad = (exp(-self.lambda_) * (self.lambda_ ** k)) / factorial(k)
                 suma_esperada += max((s + a)-k, 0) * probabilidad
                 
-            return 5 * suma_esperada
+            return self.costo_almacenamiento * suma_esperada
         
         def costo_inv_negativo(s,a):
             suma_esperada = 0.0
@@ -55,7 +76,7 @@ class Inventario(MDP):
                 probabilidad = (exp(-self.lambda_) * (self.lambda_ ** k)) / factorial(k)
                 suma_esperada += max(k - (s + a), 0) * probabilidad
 
-            return 85 * suma_esperada
+            return self.costo_perdida * suma_esperada
         
         return precio_venta(s,a) + (-costo_compra_mas_pedido(a)) + (-costo_almacenamiento(s,a)) + (-costo_inv_negativo(s,a))
          
@@ -64,17 +85,17 @@ class Inventario(MDP):
         
         D = s + a - s_
 
-        if D >= 0 and s_ > -10:
+        if D >= 0 and s_ > self.estados[0]:
             probabilidad = (exp(-self.lambda_) * (self.lambda_ ** D)) / factorial(D)
             return probabilidad
             
         if s_ > s + a:
             return 0.0
         
-        if s_ == -10:
+        if s_ == self.estados[0]:
             suma_esperada = 0.0
 
-            for k in range((s+a+10), self.k_max+1):
+            for k in range((s+a-self.estados[0]), self.k_max+1):
                 probabilidad = (exp(-self.lambda_) * (self.lambda_ ** k)) / factorial(k)
                 suma_esperada += probabilidad
 
@@ -88,6 +109,8 @@ class Inventario(MDP):
 if __name__ == "__main__":
 
     inventario = Inventario(0.95, 4)
+
+    #inventario = Inventario(0.95, 4, (-10, 10), 14, 140, 70, 50, 10, 20)
 
     pi_star, V = iteracion_valor(inventario)
 
