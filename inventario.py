@@ -158,7 +158,6 @@ Cambios V(s+1) - V(s):
 - De s=-10 a s=5: ~ΔV = 80 por unidad
 - De s=6 a s=20: ~ΔV = 76 a 60 por unidad 
 
-
 7. ¿Cómo cambiaría la política si la variabilidad de la demanda (lambda) aumenta de 4 a 8?
 
 Si λ aumenta de 4 a 8:
