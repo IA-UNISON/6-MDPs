@@ -28,7 +28,7 @@ Para el modelado, considera lo siguiente:
   * **Costo de Almacenamiento:** $5.00 por cada unidad que se quede en el estante al final del día.
   * **Costo de Backlogging (Inventario Negativo):** Si la demanda supera las existencias, los clientes aceptan esperar, pero la empresa incurre en un costo de "buena voluntad" y logística de **$15.00 por unidad faltante** al final del día.
   * **Pérdida por Demanda no Satisfecha:** Además del costo de backlogging, cada unidad demandada que no puede entregarse en el momento representa una pérdida de oportunidad (margen no ganado).
-* **A tomar en cuenta**
+* **A tomar en cuenta** 
   * **Límite Inferior de Inventario (Backlogging):** Aunque la capacidad máxima es 20, permitiremos un backlog de hasta -10 unidades para modelar la demanda insatisfecha. Por lo tanto, el espacio de estados es $S = \{-10, -9, \dots, 20\}$.
   * **Función de Recompensa ($R$):** Construye la ecuación de recompensa inmediata $R(s, a)$ que incluya los ingresos por ventas, los costos de pedido (fijos y variables), los costos de mantenimiento y las penalizaciones por faltantes.
   * **Factor de Descuento ($\gamma$):** Establecemos $\gamma = 0.95$. Esto representa la preferencia por beneficios inmediatos y garantiza la convergencia de la serie.
