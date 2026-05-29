@@ -134,9 +134,10 @@ def iteracion_politica(mdp, epsilon=1e-6, max_iter=1000):
                     )
                 )
                 if a != pi[s]:
-                    estable = False
-        if estable:
-            break
+                    optima = False
+            if optima:
+                break
+
     return pi
 
 def iteracion_valor(mdp, epsilon=1e-6, max_iter=1_000, debug=False):
